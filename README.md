@@ -20,7 +20,7 @@ Sistema de gestión de empleados desarrollado con Spring MVC y Struts 2, que per
 
 ### 1. Clonar el Repositorio
 ```bash
-git clone [URL_DEL_REPOSITORIO]
+git clone git@github.com:lrodas/PruebaJEE.git
 cd gestion-empleados
 ```
 
@@ -34,47 +34,41 @@ docker-compose up -d
 El archivo `docker-compose.yml` incluye:
 ```yaml
 version: '3.8'
+
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: empleados_db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: empleados
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
+   oracle-db:
+      image: container-registry.oracle.com/database/free:latest
+      container_name: oracle-db
+      ports:
+         - "1521:1521"
+      environment:
+         - ORACLE_PASSWORD=MyStrongPass123!
+         - ORACLE_PDB=FREEPDB1  # Nombre correcto de la PDB
+      volumes:
+         - oracle_data:/opt/oracle/oradata
+      healthcheck:
+         test: ["CMD", "sqlplus", "-L", "system/MyStrongPass123!@localhost:1521/FREEPDB1"]  # Usar FREEPDB1
+         interval: 60s
+         timeout: 30s
+         retries: 10
+         start_period: 300s
+      restart: unless-stopped
+      deploy:
+         resources:
+            limits:
+               memory: 4G
+               cpus: '2.0'
 
 volumes:
-  mysql_data:
+   oracle_data:
 ```
 
 ### 3. Configuración del Proyecto
 Actualizar el archivo `application.properties`:
 
-```properties
-# Database Configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/empleados
-spring.datasource.username=user
-spring.datasource.password=password
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-
-# Hibernate Configuration
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-```
-
 ### 4. Compilar el Proyecto
 ```bash
 mvn clean install
-```
-
-### 5. Ejecutar la Aplicación
-```bash
-mvn spring-boot:run
 ```
 
 ## Estructura del Proyecto
