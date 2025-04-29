@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 1. Escaneo de componentes Spring -->
+    <context:component-scan base-package="com.example"/>
+
+    <!-- 2. Configuración de Oracle Docker -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+        <property name="url" value="jdbc:oracle:thin:@//localhost:1521/FREEPDB1"/>
+        <property name="username" value="SYSTEM"/>
+        <property name="password" value="TuNuevaContraseñaSegura"/>
+    </bean>
+
+    <!-- 3. JDBC Template -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 4. Configuración DAO -->
+    <bean id="employeeDao" class="com.example.employees.dao.EmployeeDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <!-- 5. Configuración Service -->
+    <bean id="employeeService" class="com.example.employees.service.EmployeeServiceImpl">
+        <property name="employeeDao" ref="employeeDao"/>
+    </bean>
+
+    <!-- 6. Configuración Struts Action (para inyección Spring) -->
+    <bean id="employeeAction" class="com.example.employees.struts.actions.EmployeeAction">
+        <property name="employeeService" ref="employeeService"/>
+    </bean>
+
+    <bean id="exceptionHandler" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key="java.sql.SQLException">error/database</prop>
+                <prop key="java.lang.Exception">error/general</prop>
+            </props>
+        </property>
+    </bean>
+</beans>

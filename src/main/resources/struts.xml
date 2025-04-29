@@ -1,0 +1,41 @@
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+
+<struts>
+    <constant name="struts.objectFactory" value="spring"/>
+    <constant name="struts.devMode" value="true"/>
+
+    <package name="empleados" extends="struts-default" namespace="/">
+
+        <interceptors>
+            <interceptor-stack name="defaultStack">
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+        </interceptors>
+
+        <default-interceptor-ref name="defaultStack"/>
+
+        <action name="showRegister" class="employeeAction" method="showForm">
+            <result name="success">/WEB-INF/views/register.jsp</result>
+            <result name="input">/WEB-INF/views/register.jsp</result>
+        </action>
+
+        <action name="registerEmployee" class="employeeAction" method="register">
+            <result name="success" type="redirectAction">listEmployees</result>
+            <result name="input">/WEB-INF/views/register.jsp</result>
+            <result name="error">/WEB-INF/views/error.jsp</result>
+        </action>
+
+        <action name="listEmployees" class="employeeAction" method="list">
+            <result name="success">/WEB-INF/views/list.jsp</result>
+            <result name="input">/WEB-INF/views/list.jsp</result>
+            <result name="error">/WEB-INF/views/error.jsp</result>
+        </action>
+
+        <action name="index">
+            <result>/WEB-INF/views/register.jsp</result>
+        </action>
+
+    </package>
+</struts>
